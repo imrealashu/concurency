@@ -36,7 +36,7 @@
 	var batchFunctions = [];
 	var min = 500;
 	var max = 1500;
-	var timeout = 1000;
+	var timeout = 1000; //set time out for callback
 
 	for (var i = 0; i < 10; i += 1) {
 		batchFunctions.push(function (batch) {
@@ -45,7 +45,7 @@
 			//Some ajax call instead of setTimeout function...
 			setTimeout(function () {
 				batch.done(time);
-				console.log(i +' '+time);
+				//console.log(i +' '+time);
 			}, time);
 		});
 	}
