@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title>Async</title>
+	<script type="text/javascript">
+	(function() {
+		function Batch(functions, completionHandler) {
+			this._functions = functions;
+			this._completionHandler = completionHandler; 
+		}
+
+		Batch.prototype.execute = function execute() {
+			var i;
+			var functions = this._functions;
+			var length = this._remaining = functions.length;
+			this._results = [];
+			for (i = 0; i < length; i += 1) {
+				functions[i](this);
+			}
+		};
+
+		Batch.prototype.done = function done(result) {
+			this._remaining -= 1;
+			console.log(['Function set a timer of ', result, 'ms'].join(''));
+			if (typeof result !== 'undefined') {
+				this._results.push(result);
+			}
+			if (this._remaining === 0 && _lock === false) {
+				this._completionHandler(this._results);
+				_lock = true;
+			}
+		};
+		this.Batch = Batch;
+	}.call(this));
+
+	var _lock = false;
+	var batchFunctions = [];
+	var min = 500;
+	var max = 1500;
+	var timeout = 1000;
+
+	for (var i = 0; i < 10; i += 1) {
+		batchFunctions.push(function (batch) {
+			var time = Math.floor(Math.random() * (max - min) + min);
+
+			//Some ajax call instead of setTimeout function...
+			setTimeout(function () {
+				batch.done(time);
+				console.log(i +' '+time);
+			}, time);
+		});
+	}
+
+	var callback_f = function (results) {
+		console.log('callback Executed.....');
+	}
+
+	var timerBatch = new Batch(batchFunctions, callback_f);
+	
+	timerBatch.execute();
+	setTimeout(function () {
+		if(_lock === false){
+			console.log('Timed Out .....');
+			_lock = true;
+			callback_f();
+		}
+	}, timeout);
+	</script>
+
+</head>
+</html>
